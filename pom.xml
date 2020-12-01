@@ -8,9 +8,9 @@
         <version>2.1.6.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.example</groupId>
+    <groupId>com.cet</groupId>
     <artifactId>model-spring-boot-starter</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.3</version>
     <name>model-spring-boot-starter</name>
     <packaging>jar</packaging>
 
@@ -31,7 +31,116 @@
         </dependencies>
     </dependencyManagement>
 
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <name>cet Repository</name>
+            <url>http://191.0.0.158:9081/repository/cet</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <name>cet Repository</name>
+            <url>http://191.0.0.158:9081/repository/cet</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
+
+        <dependency>
+            <groupId>com.cet.eem</groupId>
+            <artifactId>cet-eem-common</artifactId>
+            <version>1.6.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-data-redis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-sleuth</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-zipkin</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.cet.electric</groupId>
+                    <artifactId>auth-service-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.cet.electric</groupId>
+                    <artifactId>auth-aop-spring-boot-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.logstash.logback</groupId>
+                    <artifactId>logstash-logback-encoder</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.cet.electric</groupId>
+                    <artifactId>log-wrapper-spring-boot-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.cet.electric</groupId>
+                    <artifactId>gray-release-spring-boot-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.aliyun.mns</groupId>
+                    <artifactId>aliyun-sdk-mns</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.aliyun</groupId>
+                    <artifactId>aliyun-java-sdk-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.aliyun</groupId>
+                    <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.mail</groupId>
+                    <artifactId>javax.mail-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.cet.electric</groupId>
+                    <artifactId>service-index-spring-boot-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-websocket</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jmockit</groupId>
+                    <artifactId>jmockit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.databene</groupId>
+                    <artifactId>contiperf</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jxls</groupId>
+                    <artifactId>jxls</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jxls</groupId>
+                    <artifactId>jxls-poi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jxls</groupId>
+                    <artifactId>jxls-jexcel</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.cet.electric</groupId>
+                    <artifactId>model-service-spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
