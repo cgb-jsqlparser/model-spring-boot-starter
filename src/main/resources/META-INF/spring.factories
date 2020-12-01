@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.config.ModelAdapterConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.cet.config.ModelAdapterConfiguration
