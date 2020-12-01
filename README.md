@@ -118,3 +118,14 @@ cet:
     url:
       model-service: ''
 ```
+
+#### 1.6 依赖导入
+
+```xml
+        <dependency>
+            <groupId>com.cet</groupId>
+            <artifactId>model-spring-boot-starter</artifactId>
+            <version>0.0.3</version>
+        </dependency>
+```
+
