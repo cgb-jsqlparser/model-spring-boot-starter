@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.cet</groupId>
     <artifactId>model-spring-boot-starter</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
     <name>model-spring-boot-starter</name>
     <packaging>jar</packaging>
 
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>com.cet.eem</groupId>
             <artifactId>cet-eem-common</artifactId>
-            <version>1.6.0</version>
+            <version>1.5.17-dev1.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -134,10 +134,6 @@
                 <exclusion>
                     <groupId>org.jxls</groupId>
                     <artifactId>jxls-jexcel</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.cet.electric</groupId>
-                    <artifactId>model-service-spring-boot-starter</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -11,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @ClassName : JsonUtil
@@ -42,8 +39,6 @@ public class JsonUtil {
         MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         //如果是空对象的时候,不抛异常
         MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        // 允许key有单引号
-        MAPPER.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         // 允许整数以0开头
         MAPPER.configure(JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS, true);
         // 允许字符串中存在回车换行控制符
@@ -85,9 +80,7 @@ public class JsonUtil {
             return MAPPER.writeValueAsString(obj);
         } catch (Exception e) {
             log.warn("JsonUtil toJSONString Exception,Param:{}", obj.toString(), e);
-            RuntimeException runtimeException = new RuntimeException("JsonUtil toJSONString Exception");
-            runtimeException.initCause(e);
-            throw runtimeException;
+            throw new RuntimeException("JsonUtil toJSONString Exception", e);
 
         }
     }
@@ -101,9 +94,7 @@ public class JsonUtil {
             return tClass.equals(String.class) ? (T) value : MAPPER.readValue(value, tClass);
         } catch (Exception e) {
             log.error("JsonUtil parseObject Exception,Param:{}", value, e);
-            RuntimeException runtimeException = new RuntimeException("JsonUtil parseObject Exception");
-            runtimeException.initCause(e);
-            throw runtimeException;
+            throw new RuntimeException("JsonUtil parseObject Exception", e);
         }
     }
 
@@ -116,9 +107,7 @@ public class JsonUtil {
             });
         } catch (Exception e) {
             log.error("JsonUtil parseObject Exception,Param:{}", value, e);
-            RuntimeException runtimeException = new RuntimeException("JsonUtil parseList Exception");
-            runtimeException.initCause(e);
-            throw runtimeException;
+            throw new RuntimeException("JsonUtil parseList Exception", e);
         }
     }
 
@@ -131,9 +120,20 @@ public class JsonUtil {
             });
         } catch (Exception e) {
             log.error("JsonUtil parseObject Exception,Param:{}", value, e);
-            RuntimeException runtimeException = new RuntimeException("JsonUtil parseObject Exception");
-            runtimeException.initCause(e);
-            throw runtimeException;
+            throw new RuntimeException("JsonUtil parseObject Exception", e);
+        }
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public static Map<String, Object> convert2Map(Object value) {
+        try {
+            if (Objects.isNull(value)) {
+                return null;
+            }
+            return MAPPER.convertValue(value, Map.class);
+        } catch (Exception e) {
+            log.error("JsonUtil convert2Map Exception,Param:{}", value, e);
+            throw new RuntimeException("JsonUtil parseObject Exception", e);
         }
     }
 
@@ -142,7 +142,7 @@ public class JsonUtil {
             return null;
         }
         if (mapList.size() == 0) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         List<T> resultList = new ArrayList<>(mapList.size());
         for (Map<String, Object> map : mapList) {

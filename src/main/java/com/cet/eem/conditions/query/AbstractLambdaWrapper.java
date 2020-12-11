@@ -16,7 +16,7 @@
 package com.cet.eem.conditions.query;
 
 
-import com.cet.eem.exceptions.ModelAdapterException;
+import com.cet.eem.exceptions.ModelServiceCallException;
 import com.cet.eem.toolkit.Assert;
 import com.cet.eem.toolkit.LambdaUtils;
 import com.cet.eem.toolkit.PropertyNamer;
@@ -52,11 +52,11 @@ public abstract class AbstractLambdaWrapper<T, Children extends AbstractLambdaWr
      *
      * @param lambda lambda 表达式
      * @return 列
-     * @throws ModelAdapterException 获取不到列信息时抛出异常
+     * @throws ModelServiceCallException 获取不到列信息时抛出异常
      * @see SerializedLambda#getImplClass()
      * @see SerializedLambda#getImplMethodName()
      */
-    public String getColumn(SerializedLambda lambda) throws ModelAdapterException {
+    public String getColumn(SerializedLambda lambda) throws ModelServiceCallException {
         String fieldName = PropertyNamer.methodToProperty(lambda.getImplMethodName());
         Class<?> aClass = lambda.getInstantiatedType();
         if (!initColumnMap) {

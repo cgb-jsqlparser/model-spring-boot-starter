@@ -1,6 +1,7 @@
 package com.cet.eem.dao;
 
 
+import com.cet.eem.common.model.BaseVo;
 import com.cet.eem.conditions.Wrapper;
 import com.cet.eem.common.model.Page;
 import com.cet.eem.common.model.ResultWithTotal;
@@ -157,27 +158,84 @@ public interface BaseModelDao<T extends IModel> {
      *
      * @param aClass 使用组合拼凑的具有关联关系的实体Class
      * @param id     主模型的id
-     * @param <K>    返回的实体
      * @return
      */
     <K extends T> Map<String, Object> selectRelatedTreeById(Class<K> aClass, Long id);
 
 
     /**
+     * 根据id连表查询
+     *
+     * @param aClass          使用组合拼凑的具有关联关系的实体Class
+     * @param id              主模型的id
+     * @param subModelWrapper 子模型的查询条件
+     * @return
+     */
+    <K extends T> Map<String, Object> selectRelatedTreeById(Class<K> aClass, Long id, Wrapper<? extends IModel>... subModelWrapper);
+
+    /**
      * 根据条件连表查询
      *
-     * @param aClass
-     * @param queryWrapper
-     * @param <K>
+     * @param aClass       使用组合拼凑的具有关联关系的实体Class
+     * @param queryWrapper 主模型查询条件
      * @return
      */
     <K extends T> List<K> selectRelatedList(Class<K> aClass, Wrapper<T> queryWrapper);
 
+
     /**
      * 根据条件连表查询
+     *
+     * @param aClass          使用组合拼凑的具有关联关系的实体Class
+     * @param queryWrapper    主模型查询条件
+     * @param subModelWrapper
+     * @return
+     */
+    <K extends T> List<K> selectRelatedList(Class<K> aClass, Wrapper<T> queryWrapper, Wrapper<? extends IModel>... subModelWrapper);
+
+    /**
+     * 根据条件连表查询
+     * 会查询所有带关系的模型
      *
      * @param queryWrapper
      * @return
      */
     List<Map<String, Object>> selectRelatedTreeList(Wrapper<T> queryWrapper);
+
+    /**
+     * 插入子层级
+     *
+     * @param id       父模型id
+     * @param children 子模型
+     * @return
+     */
+    List<BaseVo> insertChild(Long id, Collection<IModel> children);
+
+    /**
+     * 删除子层级
+     *
+     * @param id       父模型id
+     * @param children 子模型
+     * @return
+     */
+    List<Map<String, Object>> deleteChild(Long id, Collection<IModel> children);
+
+    /**
+     * 删除子层级
+     *
+     * @param id       父模型id
+     * @param children 子模型
+     * @return
+     */
+    List<Map<String, Object>> moveChild(Long id, Collection<IModel> children);
+
+    /**
+     * 删除子层级
+     *
+     * @param id       父模型id
+     * @param oldChild 旧模型
+     * @param newChild 新模型
+     * @return
+     */
+    List<Map<String, Object>> replaceChild(Long id, IModel oldChild, IModel newChild);
 }

@@ -1,6 +1,6 @@
 package com.cet.eem.scanner;
 
-import com.cet.eem.model.feign.ModelDataServiceSubstitution;
+import com.cet.eem.model.feign.ModelDataService;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
@@ -24,7 +24,7 @@ public class ServiceProxyFactoryBean<T> implements FactoryBean<T> {
      */
     private final T springRepository;
 
-    private final ModelDataServiceSubstitution modelDataService;
+    private final ModelDataService modelDataService;
 
     @SuppressWarnings("unchecked")
     public ServiceProxyFactoryBean(String interfacesClassName, ApplicationContext applicationContext) {
@@ -35,7 +35,7 @@ public class ServiceProxyFactoryBean<T> implements FactoryBean<T> {
         }
         Map<String, T> beansOfType = applicationContext.getBeansOfType(interfaces);
         springRepository = beansOfType.values().stream().findAny().orElse(null);
-        modelDataService = applicationContext.getBean(ModelDataServiceSubstitution.class);
+        modelDataService = applicationContext.getBean(ModelDataService.class);
         Assert.notNull(modelDataService, "ModelDataService Fegin Client Not Found");
     }
 

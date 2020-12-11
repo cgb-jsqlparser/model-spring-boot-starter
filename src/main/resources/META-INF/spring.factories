@@ -1,1 +1,3 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.cet.eem.config.ModelAdapterConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cet.eem.config.ModelAdapterConfiguration,\
+  com.cet.eem.config.ModelFeignConfiguration

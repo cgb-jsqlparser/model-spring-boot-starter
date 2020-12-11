@@ -1,11 +1,11 @@
 package com.cet.eem.common.util;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
@@ -17,8 +17,8 @@ import java.time.ZoneOffset;
  */
 public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
     @Override
-    public LocalDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+    public LocalDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         long timestamp = jsonParser.getLongValue();
-        return LocalDateTime.ofEpochSecond(timestamp / 1000, (int) ((timestamp % 1000)* 1000000), ZoneOffset.ofHours(8));
+        return Instant.ofEpochMilli(timestamp).atZone(ZoneOffset.ofHours(8)).toLocalDateTime();
     }
 }

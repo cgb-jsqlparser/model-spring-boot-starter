@@ -18,6 +18,7 @@ public abstract class AbstractModelEntity implements IModel {
         this.modelLabel = TableInfoHelper.getModelLabel(this.getClass());
     }
 
+
     @Override
     public Long getId() {
         return this.id;

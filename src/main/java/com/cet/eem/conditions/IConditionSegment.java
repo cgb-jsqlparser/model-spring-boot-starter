@@ -16,7 +16,7 @@
 package com.cet.eem.conditions;
 
 
-import com.cet.eem.common.model.QueryCondition;
+import com.cet.eem.model.base.QueryCondition;
 
 /**
  * 条件片段接口

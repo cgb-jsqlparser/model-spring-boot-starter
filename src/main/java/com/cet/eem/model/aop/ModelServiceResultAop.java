@@ -3,7 +3,7 @@ package com.cet.eem.model.aop;
 
 import com.cet.eem.common.util.JsonUtil;
 import com.cet.eem.common.model.Result;
-import com.cet.eem.model.exception.ModelServiceCallException;
+import com.cet.eem.exceptions.ModelServiceCallException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -20,7 +20,7 @@ import org.aspectj.lang.annotation.Pointcut;
 @Slf4j
 public class ModelServiceResultAop {
 
-    @Pointcut("execution(* com.cet.eem.model.feign.ModelDataServiceSubstitution.*(..))")
+    @Pointcut("execution(* com.cet.eem.model.feign.ModelDataService.*(..))")
     public void resultHandler() {
 
     }

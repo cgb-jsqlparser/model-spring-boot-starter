@@ -17,7 +17,7 @@ package com.cet.eem.toolkit;
 
 
 
-import com.cet.eem.exceptions.ModelAdapterException;
+import com.cet.eem.exceptions.ModelServiceCallException;
 
 import java.util.Locale;
 
@@ -36,7 +36,7 @@ public final class PropertyNamer {
     } else if (name.startsWith("get") || name.startsWith("set")) {
       name = name.substring(3);
     } else {
-      throw new ModelAdapterException("Error parsing property name '" + name + "'.  Didn't start with 'is', 'get' or 'set'.");
+      throw new ModelServiceCallException("Error parsing property name '" + name + "'.  Didn't start with 'is', 'get' or 'set'.");
     }
 
     if (name.length() == 1 || (name.length() > 1 && !Character.isUpperCase(name.charAt(1)))) {

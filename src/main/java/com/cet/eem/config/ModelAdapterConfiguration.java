@@ -17,13 +17,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnClass(EnableModel.class)
-@EnableFeignClients(basePackages = {"com.cet.eem.model.feign"})
 public class ModelAdapterConfiguration {
-
-    @Bean
-    public ModelServiceResultAop modelServiceResultAop() {
-        return new ModelServiceResultAop();
-    }
 
     @Bean
     public ObjectMapper objectMapper() {

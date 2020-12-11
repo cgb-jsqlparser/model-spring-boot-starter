@@ -1,9 +1,9 @@
 package com.cet.eem.metadata;
 
 import com.cet.eem.annotation.ModelLabel;
-import com.cet.eem.common.feign.ModelDataService;
 import com.cet.eem.common.model.Result;
-import com.cet.eem.exceptions.ModelAdapterException;
+import com.cet.eem.exceptions.ModelServiceCallException;
+import com.cet.eem.model.feign.ModelDataService;
 import com.cet.eem.model.model.IModel;
 import com.cet.eem.toolkit.CollectionUtils;
 import com.cet.eem.toolkit.ReflectionKit;
@@ -134,7 +134,7 @@ public class TableInfoHelper {
         for (String propertyLabel : propertyLabelList) {
             List<Field> collect = Arrays.stream(declaredFields).filter(s -> fieldMatching(propertyLabel, s)).collect(Collectors.toList());
             if (collect.size() > 1) {
-                throw new ModelAdapterException("define two field with same name");
+                throw new ModelServiceCallException("define two field with same name");
             }
             if (CollectionUtils.isEmpty(collect)) {
                 continue;

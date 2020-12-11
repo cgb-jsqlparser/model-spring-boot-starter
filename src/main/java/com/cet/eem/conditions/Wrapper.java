@@ -17,10 +17,11 @@ package com.cet.eem.conditions;
 
 
 import com.cet.eem.metadata.TableFieldInfo;
+import com.cet.eem.metadata.TableInfoHelper;
+import com.cet.eem.model.base.QueryCondition;
 import com.cet.eem.toolkit.ReflectionKit;
+import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,15 +33,24 @@ import java.util.Objects;
 @SuppressWarnings("all")
 public abstract class Wrapper<T> {
 
-    protected Map<String, Object> paramMap = new HashMap<>();
+    /**
+     * 对应实体的实体类
+     */
+    protected Class<T> tClass;
+
+    @Getter
+    protected QueryCondition.Builder queryCondition = null;
 
     /**
-     * 获取参数
+     * 获取操作的模型名
      *
      * @return
      */
-    public final Map<String, Object> getParam() {
-        return paramMap;
+    public String getModelLabel() {
+        if (Objects.isNull(tClass)) {
+            return null;
+        }
+        return TableInfoHelper.getModelLabel(tClass);
     }
 
     /**

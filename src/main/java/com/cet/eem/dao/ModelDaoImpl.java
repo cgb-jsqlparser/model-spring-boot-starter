@@ -1,16 +1,19 @@
 package com.cet.eem.dao;
 
 import com.cet.eem.annotation.FieldStrategy;
+import com.cet.eem.common.model.*;
 import com.cet.eem.common.util.JsonUtil;
 import com.cet.eem.conditions.Wrapper;
-import com.cet.eem.common.constant.ConditionOperator;
-import com.cet.eem.common.model.*;
-import com.cet.eem.conditions.query.QueryWrapper;
 import com.cet.eem.metadata.TableFieldInfo;
 import com.cet.eem.metadata.TableInfo;
 import com.cet.eem.metadata.TableInfoHelper;
-import com.cet.eem.model.feign.ModelDataServiceSubstitution;
+import com.cet.eem.model.base.QueryCondition;
+import com.cet.eem.model.base.SingleModelConditionDTO;
+import com.cet.eem.model.constant.ConditionOperator;
+import com.cet.eem.model.feign.ModelDataService;
 import com.cet.eem.model.model.IModel;
+import com.cet.eem.model.tool.ModelRelationCud;
+import com.cet.eem.model.tool.QueryResultContentTaker;
 import com.cet.eem.toolkit.CollectionUtils;
 import com.cet.eem.toolkit.ReflectionKit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +27,7 @@ import java.util.stream.Collectors;
 public class ModelDaoImpl<T extends IModel> implements BaseModelDao<T> {
 
     @Autowired
-    protected ModelDataServiceSubstitution modelDataService;
+    protected ModelDataService modelDataService;
 
     private Class<T> modelEntityClass;
 
@@ -33,7 +36,7 @@ public class ModelDaoImpl<T extends IModel> implements BaseModelDao<T> {
         this.modelEntityClass = (Class<T>) ReflectionKit.getClassGenericType(getClass(), 0);
     }
 
-    public ModelDaoImpl(Class modelDaoClass, ModelDataServiceSubstitution modelDataService) {
+    public ModelDaoImpl(Class modelDaoClass, ModelDataService modelDataService) {
         if (modelDaoClass.isInterface()) {
             this.modelEntityClass = (Class<T>) ReflectionKit.getInterfaceClassGenericType(modelDaoClass, 0);
         } else {
@@ -278,8 +281,7 @@ public class ModelDaoImpl<T extends IModel> implements BaseModelDao<T> {
         builder.filterByPrimaryKey(id);
         Set<String> ownModelNameList = modelInfo.getOwnModelNameList();
         for (String modelLabel : ownModelNameList) {
-            SingleModelConditionDTO build = new SingleModelConditionDTO.Builder(modelLabel).build();
-            builder.own(build);
+            builder.own(new SingleModelConditionDTO(modelLabel));
         }
         ResultWithTotal<List<Map<String, Object>>> query = modelDataService.query(builder.build());
         List<K> ks = JsonUtil.mapList2BeanList(query.getData(), aClass);
@@ -296,9 +298,21 @@ public class ModelDaoImpl<T extends IModel> implements BaseModelDao<T> {
         builder.tree();
         Set<String> ownModelNameList = modelInfo.getOwnModelNameList();
         for (String modelLabel : ownModelNameList) {
-            SingleModelConditionDTO build = new SingleModelConditionDTO.Builder(modelLabel).build();
-            builder.own(build);
+            builder.own(new SingleModelConditionDTO(modelLabel));
         }
+        ResultWithTotal<List<Map<String, Object>>> query = modelDataService.query(builder.build());
+        return query.getData().stream().findAny().orElse(null);
+    }
+
+    @Override
+    public <K extends T> Map<String, Object> selectRelatedTreeById(Class<K> aClass, Long id, Wrapper<? extends IModel>... subModelWrapper) {
+        Assert.notNull(id, "selectRelated Id Cannot Be Null");
+        TableInfo modelInfo = TableInfoHelper.getModelInfo(aClass);
+        String tableName = modelInfo.getTableName();
+        QueryCondition.Builder builder = new QueryCondition.Builder(tableName);
+        builder.filterByPrimaryKey(id);
+        builder.tree();
+        addChildren(builder, subModelWrapper);
         ResultWithTotal<List<Map<String, Object>>> query = modelDataService.query(builder.build());
         return query.getData().stream().findAny().orElse(null);
     }
@@ -311,12 +325,61 @@ public class ModelDaoImpl<T extends IModel> implements BaseModelDao<T> {
     }
 
     @Override
+    public <K extends T> List<K> selectRelatedList(Class<K> aClass, Wrapper<T> queryWrapper, Wrapper<? extends IModel>... subModelWrapper) {
+        QueryCondition.Builder builder = getQueryConditionByWrapperWithoutRelation(queryWrapper);
+        addChildren(builder, subModelWrapper);
+        ResultWithTotal<List<Map<String, Object>>> query = modelDataService.query(builder.build());
+        return JsonUtil.mapList2BeanList(query.getData(), aClass);
+    }
+
+    @Override
     public List<Map<String, Object>> selectRelatedTreeList(Wrapper<T> queryWrapper) {
         QueryCondition.Builder queryConditionByWrapper = getQueryConditionByWrapperWithRelation(queryWrapper, null);
         queryConditionByWrapper.tree();
         ResultWithTotal<List<Map<String, Object>>> query = modelDataService.query(queryConditionByWrapper.build());
         return query.getData();
     }
+
+    @Override
+    public List<BaseVo> insertChild(Long id, Collection<IModel> children) {
+        ModelRelationCud relationModelCud = new ModelRelationCud();
+        ModelRelationCud.Builder builder = new ModelRelationCud.Builder(id, TableInfoHelper.getModelLabel(modelEntityClass));
+        builder.saveChildModel(children);
+        relationModelCud.addRelation(builder);
+        Result<Object> write = modelDataService.write(relationModelCud.getObjectMapList());
+        return JsonUtil.mapList2BeanList(QueryResultContentTaker.getChildrenAtFirstElement(write.getData()), BaseVo.class);
+    }
+
+    @Override
+    public List<Map<String, Object>> deleteChild(Long id, Collection<IModel> children) {
+        ModelRelationCud relationModelCud = new ModelRelationCud();
+        ModelRelationCud.Builder builder = new ModelRelationCud.Builder(id, TableInfoHelper.getModelLabel(modelEntityClass));
+        builder.deleteChildModel(children);
+        relationModelCud.addRelation(builder);
+        Result<Object> write = modelDataService.write(relationModelCud.getObjectMapList());
+        return (List<Map<String, Object>>) write.getData();
+    }
+
+    @Override
+    public List<Map<String, Object>> moveChild(Long id, Collection<IModel> children) {
+        ModelRelationCud relationModelCud = new ModelRelationCud();
+        ModelRelationCud.Builder builder = new ModelRelationCud.Builder(id, TableInfoHelper.getModelLabel(modelEntityClass));
+        builder.moveChildModel(children);
+        relationModelCud.addRelation(builder);
+        Result<Object> write = modelDataService.write(relationModelCud.getObjectMapList());
+        return (List<Map<String, Object>>) write.getData();
+    }
+
+    @Override
+    public List<Map<String, Object>> replaceChild(Long id, IModel oldChild, IModel newChild) {
+        ModelRelationCud relationModelCud = new ModelRelationCud();
+        ModelRelationCud.Builder builder = new ModelRelationCud.Builder(id, TableInfoHelper.getModelLabel(modelEntityClass));
+        builder.replaceChildModel(oldChild, newChild);
+        relationModelCud.addRelation(builder);
+        Result<Object> write = modelDataService.write(relationModelCud.getObjectMapList());
+        return (List<Map<String, Object>>) write.getData();
+    }
+
 
     private <K extends T> QueryCondition.Builder getQueryConditionByWrapperWithRelation(Wrapper<T> queryWrapper, Class<K> kClass) {
         QueryCondition.Builder queryConditionByWrapperWithoutRelation = getQueryConditionByWrapperWithoutRelation(queryWrapper);
@@ -329,14 +392,29 @@ public class ModelDaoImpl<T extends IModel> implements BaseModelDao<T> {
         return queryConditionByWrapperWithoutRelation;
     }
 
+
     private QueryCondition.Builder getQueryConditionByWrapperWithoutRelation(Wrapper<T> queryWrapper) {
         QueryCondition.Builder queryConditionBuilder = null;
         if (queryWrapper == null) {
             TableInfo modelInfo = TableInfoHelper.getModelInfo(modelEntityClass);
             queryConditionBuilder = new QueryCondition.Builder(modelInfo.getTableName());
         } else {
-            queryConditionBuilder = (QueryCondition.Builder) queryWrapper.getParam().get("QUERY");
+            queryConditionBuilder = queryWrapper.getQueryCondition();
         }
         return queryConditionBuilder;
+    }
+
+
+    private void addChildren(QueryCondition.Builder parent, Wrapper<? extends IModel>... children) {
+        TableInfo modelInfo = TableInfoHelper.getModelInfo(modelEntityClass);
+        Set<String> ownModelNameList = modelInfo.getOwnModelNameList();
+        if (Objects.nonNull(children) && children.length > 0) {
+            for (Wrapper<? extends IModel> wrapper : children) {
+                String modelLabel = wrapper.getModelLabel();
+                if (ownModelNameList.contains(modelLabel)) {
+                    parent.own(wrapper.getQueryCondition().convertToSubModel());
+                }
+            }
+        }
     }
 }

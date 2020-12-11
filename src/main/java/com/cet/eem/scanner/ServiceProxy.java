@@ -1,8 +1,7 @@
 package com.cet.eem.scanner;
 
 import com.cet.eem.dao.ModelDaoImpl;
-import com.cet.eem.common.feign.ModelDataService;
-import com.cet.eem.model.feign.ModelDataServiceSubstitution;
+import com.cet.eem.model.feign.ModelDataService;
 import com.cet.eem.model.model.IModel;
 
 import java.lang.reflect.InvocationHandler;
@@ -18,9 +17,9 @@ public class ServiceProxy<T extends IModel> implements InvocationHandler {
 
     private Class<T> interfaces;
 
-    private ModelDataServiceSubstitution modelDataService;
+    private ModelDataService modelDataService;
 
-    ServiceProxy(Class<T> interfaces, ModelDataServiceSubstitution modelDataService) {
+    ServiceProxy(Class<T> interfaces, ModelDataService modelDataService) {
         this.interfaces = interfaces;
         this.modelDataService = modelDataService;
     }

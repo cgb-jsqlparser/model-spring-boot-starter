@@ -1,7 +1,7 @@
 package com.cet.eem.scanner;
 
-import com.cet.eem.common.feign.ModelDataService;
 import com.cet.eem.metadata.TableInfoHelper;
+import com.cet.eem.model.feign.ModelDataService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;

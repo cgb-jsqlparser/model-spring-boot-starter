@@ -1,8 +1,8 @@
 package com.cet.eem.conditions.query;
 
 
-import com.cet.eem.common.model.ConditionBlock;
-import com.cet.eem.common.model.ConditionBlockCompose;
+import com.cet.eem.model.base.ConditionBlock;
+import com.cet.eem.model.base.ConditionBlockCompose;
 import com.cet.eem.model.model.IModel;
 import com.cet.eem.toolkit.Assert;
 
@@ -20,9 +20,7 @@ public class QueryWrapper<T> extends AbstractQueryWrapper<T, String, QueryWrappe
 
 
     public static <T extends IModel> QueryWrapper<T> of(Class<T> tClass) {
-        QueryWrapper<T> queryWrapper = new QueryWrapper<>(tClass);
-        queryWrapper.tClass = tClass;
-        return queryWrapper;
+        return new QueryWrapper<>(tClass);
     }
 
     private QueryWrapper(Class<T> tClass) {
@@ -32,7 +30,7 @@ public class QueryWrapper<T> extends AbstractQueryWrapper<T, String, QueryWrappe
 
     @Override
     public QueryWrapper<T> or() {
-        ConditionBlockCompose filter = getFilter();
+        ConditionBlockCompose filter = this.queryCondition.getFilter();
         List<ConditionBlock> expressions = filter.getExpressions();
         boolean composeMethod = filter.isComposemethod();
         if (expressions.size() > 1 && composeMethod) {
@@ -44,25 +42,25 @@ public class QueryWrapper<T> extends AbstractQueryWrapper<T, String, QueryWrappe
 
     @Override
     public QueryWrapper<T> and(Consumer<QueryWrapper<T>> consumer) {
-        boolean composeMethod = getFilter().isComposemethod();
+        boolean composeMethod = this.queryCondition.getFilter().isComposemethod();
         Assert.isFalse(composeMethod, "not allow use different logical connector");
         QueryWrapper<T> queryWrapper = new QueryWrapper<>(this.tClass);
         queryWrapper.globalTagId = this.globalTagId + 1;
         consumer.accept(queryWrapper);
-        List<ConditionBlock> expressions = queryWrapper.getFilter().getExpressions();
-        this.getFilter().getExpressions().addAll(expressions);
+        List<ConditionBlock> expressions = queryWrapper.queryCondition.getFilter().getExpressions();
+        this.queryCondition.getFilter().getExpressions().addAll(expressions);
         return this;
     }
 
     @Override
     public QueryWrapper<T> or(Consumer<QueryWrapper<T>> consumer) {
-        boolean composeMethod = getFilter().isComposemethod();
+        boolean composeMethod = this.queryCondition.getFilter().isComposemethod();
         Assert.isTrue(composeMethod, "not allow use different logical connector");
         QueryWrapper<T> queryWrapper = new QueryWrapper<>(this.tClass);
         queryWrapper.globalTagId = this.globalTagId + 1;
         consumer.accept(queryWrapper);
-        List<ConditionBlock> expressions = queryWrapper.getFilter().getExpressions();
-        this.getFilter().getExpressions().addAll(expressions);
+        List<ConditionBlock> expressions = queryWrapper.getQueryCondition().getFilter().getExpressions();
+        this.queryCondition.getFilter().getExpressions().addAll(expressions);
         return this;
     }
 

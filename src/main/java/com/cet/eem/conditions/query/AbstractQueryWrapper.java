@@ -21,9 +21,9 @@ import com.cet.eem.conditions.interfaces.Compare;
 import com.cet.eem.conditions.interfaces.Func;
 import com.cet.eem.conditions.interfaces.Join;
 import com.cet.eem.conditions.interfaces.Nested;
-import com.cet.eem.common.constant.ConditionOperator;
-import com.cet.eem.common.model.*;
 import com.cet.eem.metadata.TableInfoHelper;
+import com.cet.eem.model.base.*;
+import com.cet.eem.model.constant.ConditionOperator;
 import com.cet.eem.toolkit.CollectionUtils;
 
 import java.util.*;
@@ -41,16 +41,6 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
         implements Compare<Children, R>, Nested<Children, Children>, Join<T, R, Children>, Func<Children, R>, Query<Children, R> {
 
 
-    /**
-     * 对应实体的实体类
-     */
-    protected Class<T> tClass;
-
-
-    /**
-     * 查询条件
-     */
-    protected QueryCondition.Builder queryCondition;
 
     /**
      * 排序优先级
@@ -63,70 +53,20 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
     protected int globalTagId = 1;
 
     public AbstractQueryWrapper(Class<T> tClass) {
+        this.tClass = tClass;
         String modelLabel = TableInfoHelper.getModelLabel(tClass);
         this.queryCondition = new QueryCondition.Builder(modelLabel);
-        this.paramMap.put("QUERY", queryCondition);
     }
 
     @Override
     public Children select(R... columns) {
-        FlatQueryConditionDTO rootCondition = getRootCondition();
+        FlatQueryConditionDTO rootCondition = this.queryCondition.getRootCondition();
         List<String> columnsList = new ArrayList<>();
         for (R column : columns) {
             columnsList.add(keyToString(column));
         }
         rootCondition.setProps(columnsList);
         return (Children) this;
-    }
-
-    protected FlatQueryConditionDTO getRootCondition() {
-        FlatQueryConditionDTO flatQueryConditionDTO = this.queryCondition.getRootCondition();
-        if (flatQueryConditionDTO == null) {
-            flatQueryConditionDTO = new FlatQueryConditionDTO();
-            this.queryCondition.setRootCondition(flatQueryConditionDTO);
-        }
-        return flatQueryConditionDTO;
-    }
-
-    protected ConditionBlockCompose getFilter() {
-        FlatQueryConditionDTO rootCondition = getRootCondition();
-        ConditionBlockCompose filter = rootCondition.getFilter();
-        if (filter == null) {
-            filter = new ConditionBlockCompose();
-            filter.setComposemethod(true);
-            rootCondition.setFilter(filter);
-        }
-
-        return filter;
-    }
-
-    protected List<GroupBy> getGroupBys() {
-        FlatQueryConditionDTO rootCondition = getRootCondition();
-        List<GroupBy> groupbys = rootCondition.getGroupbys();
-        if (groupbys == null) {
-            groupbys = new ArrayList<>(4);
-            rootCondition.setGroupbys(groupbys);
-        }
-        return groupbys;
-    }
-
-    protected List<Order> getOrders() {
-        FlatQueryConditionDTO rootCondition = getRootCondition();
-        List<Order> orders = rootCondition.getOrders();
-        if (orders == null) {
-            orders = new ArrayList<>(4);
-            rootCondition.setOrders(orders);
-        }
-        return orders;
-    }
-
-    protected List<SingleModelConditionDTO> getSubLayerConditions() {
-        List<SingleModelConditionDTO> singleModelConditionDTOList = this.queryCondition.getSubLayerConditions();
-        if (singleModelConditionDTOList == null) {
-            singleModelConditionDTOList = new ArrayList<>(8);
-            this.queryCondition.setSubLayerConditions(singleModelConditionDTOList);
-        }
-        return singleModelConditionDTOList;
     }
 
     @Override
@@ -151,7 +91,7 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
 
     @Override
     public Children eq(R column, Object val) {
-        ConditionBlockCompose conditionBlockCompose = getFilter();
+        ConditionBlockCompose conditionBlockCompose = this.queryCondition.getFilter();
         ConditionBlock conditionBlock = new ConditionBlock(keyToString(column), ConditionOperator.EQ.getValue(), val);
         conditionBlock.setTagid(globalTagId);
         conditionBlockCompose.getExpressions().add(conditionBlock);
@@ -160,7 +100,7 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
 
     @Override
     public Children ne(R column, Object val) {
-        ConditionBlockCompose conditionBlockCompose = getFilter();
+        ConditionBlockCompose conditionBlockCompose = this.queryCondition.getFilter();
         ConditionBlock conditionBlock = new ConditionBlock(keyToString(column), ConditionOperator.NE.getValue(), val);
         conditionBlock.setTagid(globalTagId);
         conditionBlockCompose.getExpressions().add(conditionBlock);
@@ -169,7 +109,7 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
 
     @Override
     public Children gt(R column, Object val) {
-        ConditionBlockCompose conditionBlockCompose = getFilter();
+        ConditionBlockCompose conditionBlockCompose = this.queryCondition.getFilter();
         ConditionBlock conditionBlock = new ConditionBlock(keyToString(column), ConditionOperator.GT.getValue(), val);
         conditionBlock.setTagid(globalTagId);
         conditionBlockCompose.getExpressions().add(conditionBlock);
@@ -178,7 +118,7 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
 
     @Override
     public Children ge(R column, Object val) {
-        ConditionBlockCompose conditionBlockCompose = getFilter();
+        ConditionBlockCompose conditionBlockCompose = this.queryCondition.getFilter();
         ConditionBlock conditionBlock = new ConditionBlock(keyToString(column), ConditionOperator.GE.getValue(), val);
         conditionBlock.setTagid(globalTagId);
         conditionBlockCompose.getExpressions().add(conditionBlock);
@@ -187,7 +127,7 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
 
     @Override
     public Children lt(R column, Object val) {
-        ConditionBlockCompose conditionBlockCompose = getFilter();
+        ConditionBlockCompose conditionBlockCompose = this.queryCondition.getFilter();
         ConditionBlock conditionBlock = new ConditionBlock(keyToString(column), ConditionOperator.LT.getValue(), val);
         conditionBlock.setTagid(globalTagId);
         conditionBlockCompose.getExpressions().add(conditionBlock);
@@ -196,7 +136,7 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
 
     @Override
     public Children le(R column, Object val) {
-        ConditionBlockCompose conditionBlockCompose = getFilter();
+        ConditionBlockCompose conditionBlockCompose = this.queryCondition.getFilter();
         ConditionBlock conditionBlock = new ConditionBlock(keyToString(column), ConditionOperator.LE.getValue(), val);
         conditionBlock.setTagid(globalTagId);
         conditionBlockCompose.getExpressions().add(conditionBlock);
@@ -205,7 +145,7 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
 
     @Override
     public Children like(R column, Object val) {
-        ConditionBlockCompose conditionBlockCompose = getFilter();
+        ConditionBlockCompose conditionBlockCompose = this.queryCondition.getFilter();
         ConditionBlock conditionBlock = new ConditionBlock(keyToString(column), ConditionOperator.LIKE.getValue(), val);
         conditionBlock.setTagid(globalTagId);
         conditionBlockCompose.getExpressions().addAll(Arrays.asList(conditionBlock, conditionBlock));
@@ -214,7 +154,7 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
 
     @Override
     public Children in(R column, Collection<?> coll) {
-        ConditionBlockCompose conditionBlockCompose = getFilter();
+        ConditionBlockCompose conditionBlockCompose = this.queryCondition.getFilter();
         ConditionBlock conditionBlock = new ConditionBlock(keyToString(column), ConditionOperator.IN.getValue(), coll);
         conditionBlock.setTagid(globalTagId);
         conditionBlockCompose.getExpressions().addAll(Arrays.asList(conditionBlock, conditionBlock));
@@ -225,7 +165,7 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
     @Override
     public Children orderBy(boolean isAsc, R... columns) {
         String orderType = isAsc ? "asc" : "desc";
-        List<Order> orders = getOrders();
+        List<Order> orders = this.queryCondition.getOrders();
         for (R column : columns) {
             Order order = new Order(keyToString(column), orderType, orderPriority++);
             orders.add(order);
@@ -235,7 +175,7 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
 
     @Override
     public Children or() {
-        ConditionBlockCompose filter = getFilter();
+        ConditionBlockCompose filter = this.queryCondition.getFilter();
         List<ConditionBlock> expressions = filter.getExpressions();
         boolean composeMethod = filter.isComposemethod();
         if (expressions.size() > 1 && composeMethod) {
@@ -249,10 +189,10 @@ public abstract class AbstractQueryWrapper<T, R, Children extends AbstractQueryW
     @Override
     public Children join(Supplier<? extends AbstractQueryWrapper<T, R, Children>> supplier) {
         AbstractQueryWrapper<T, R, Children> abstractQueryWrapper = supplier.get();
-        FlatQueryConditionDTO rootCondition = abstractQueryWrapper.getRootCondition();
+        FlatQueryConditionDTO rootCondition = abstractQueryWrapper.getQueryCondition().getRootCondition();
         ConditionBlockCompose filter = rootCondition.getFilter();
         if (filter != null) {
-            List<SingleModelConditionDTO> subLayerConditions = this.getSubLayerConditions();
+            List<SingleModelConditionDTO> subLayerConditions = this.queryCondition.getSubLayer();
             SingleModelConditionDTO singleModelConditionDTO = new SingleModelConditionDTO();
             singleModelConditionDTO.setFilter(filter);
             singleModelConditionDTO.setModelLabel(null);

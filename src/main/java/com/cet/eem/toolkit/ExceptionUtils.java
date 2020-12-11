@@ -1,6 +1,6 @@
 package com.cet.eem.toolkit;
 
-import com.cet.eem.exceptions.ModelAdapterException;
+import com.cet.eem.exceptions.ModelServiceCallException;
 
 /**
  * 异常辅助工具类
@@ -20,8 +20,8 @@ public final class ExceptionUtils {
      * @param t   异常信息
      * @return 返回异常
      */
-    public static ModelAdapterException mpe(String msg, Throwable t, Object... params) {
-        return new ModelAdapterException(StringUtils.format(msg, params), t);
+    public static ModelServiceCallException mpe(String msg, Throwable t, Object... params) {
+        return new ModelServiceCallException(StringUtils.format(msg, params), t);
     }
 
     /**
@@ -30,8 +30,8 @@ public final class ExceptionUtils {
      * @param msg 消息
      * @return 返回异常
      */
-    public static ModelAdapterException mpe(String msg, Object... params) {
-        return new ModelAdapterException(StringUtils.format(msg, params));
+    public static ModelServiceCallException mpe(String msg, Object... params) {
+        return new ModelServiceCallException(StringUtils.format(msg, params));
     }
 
     /**
@@ -40,8 +40,8 @@ public final class ExceptionUtils {
      * @param t 异常
      * @return 返回异常
      */
-    public static ModelAdapterException mpe(Throwable t) {
-        return new ModelAdapterException(t);
+    public static ModelServiceCallException mpe(Throwable t) {
+        return new ModelServiceCallException(t);
     }
 
 }
